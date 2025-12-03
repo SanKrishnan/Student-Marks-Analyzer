@@ -133,5 +133,5 @@ def login_page():
     return render_template("Login_signup.html")
 
 
-app.run(debug=True, port=5500)
+
 
