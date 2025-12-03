@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Student Marks Analyzer</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="min-h-screen flex items-center justify-center
+             bg-gradient-to-br from-[#e9f0f8] via-[#f3f6fb] to-[#dbeafe]">
+
+<div class="fixed top-4 right-4 z-50 relative">
+
+  <!-- USER ICON -->
+<div class="fixed top-4 right-4 z-[9999]">
+
+  <button id="authBtn"
+    class="w-12 h-12 flex items-center justify-center
+           rounded-full bg-[#1f3757]
+           hover:bg-[#162a44] shadow-lg">
+           
+    <!-- SVG USER ICON -->
+    <svg xmlns="http://www.w3.org/2000/svg"
+         viewBox="0 0 24 24"
+         fill="none"
+         stroke="white"
+         stroke-width="2"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         class="w-6 h-6">
+      <path d="M20 21c0-2.8-3.6-5-8-5s-8 2.2-8 5"/>
+      <circle cx="12" cy="7" r="4"/>
+    </svg>
+  </button>
+
+  <!-- DROPDOWN -->
+  <div id="userMenu"
+    class="hidden absolute right-0 mt-3 w-40
+           bg-white rounded-lg shadow-lg border overflow-hidden">
+    <button id="profileBtn"
+      class="block w-full text-left px-4 py-2 hover:bg-gray-100">
+      Profile
+    </button>
+    <button id="logoutBtn"
+      class="block w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100">
+      Logout
+    </button>
+  </div>
+</div>
+
+<!-- ================= MAIN CARD ================= -->
+<div class="bg-white p-8 rounded-2xl shadow-xl
+            w-full max-w-md border border-gray-200">
+
+  <h1 class="text-3xl font-bold text-center mb-6 text-[#1f3757]">
+    Student Marks Analyzer
+  </h1>
+
+  <!-- FORM -->
+  <form id="marksForm" class="space-y-4">
+    <input type="text" name="student_name" placeholder="Student Name" required
+      class="w-full p-3 rounded-lg border border-gray-300
+             focus:outline-none focus:ring-2
+             focus:ring-[#1f3757]">
+
+    <input type="number" name="Course1" placeholder="Course 1 Marks" required
+      class="w-full p-3 rounded-lg border border-gray-300">
+
+    <input type="number" name="Course2" placeholder="Course 2 Marks" required
+      class="w-full p-3 rounded-lg border border-gray-300">
+
+    <input type="number" name="Course3" placeholder="Course 3 Marks" required
+      class="w-full p-3 rounded-lg border border-gray-300">
+
+    <button type="submit"
+      class="w-full bg-[#1f3757] text-white py-3 rounded-lg
+             text-lg font-semibold hover:bg-[#162a44]">
+      Analyze
+    </button>
+  </form>
+
+  <p id="error" class="text-red-500 text-center mt-4"></p>
+
+  <!-- RESULT -->
+  <div id="result"
+    class="mt-6 hidden bg-[#dbeafe] p-6
+           rounded-xl border border-blue-300">
+    <h2 class="text-2xl font-bold mb-4 text-[#1f3757]">
+      Analysis Result
+    </h2>
+
+    <p><strong>Student:</strong> <span id="student"></span></p>
+    <p><strong>Course 1:</strong> <span id="course1"></span></p>
+    <p><strong>Course 2:</strong> <span id="course2"></span></p>
+    <p><strong>Course 3:</strong> <span id="course3"></span></p>
+    <p><strong>Total:</strong> <span id="total"></span></p>
+    <p><strong>Average:</strong> <span id="average"></span></p>
+    <p><strong>Result:</strong> <span id="finalResult"></span></p>
+  </div>
+</div>
+
+<!-- ================= PROFILE MODAL ================= -->
+<div id="profileModal"
+  class="hidden fixed inset-0 z-50 flex
+         items-center justify-center
+         bg-black bg-opacity-50">
+
+  <div class="bg-white w-96 rounded-2xl
+              shadow-xl p-6 relative">
+
+    <button id="closeProfile"
+      class="absolute top-3 right-3
+             text-gray-500 hover:text-gray-800">
+      ✕
+    </button>
+
+    <h2 class="text-2xl font-bold text-[#1f3757] mb-4">
+      ✅ Profile Summary
+    </h2>
+
+    <div id="profileData"
+      class="space-y-2 text-sm text-gray-700
+             max-h-64 overflow-y-auto">
+    </div>
+
+    <div class="mt-6 text-right">
+      <button id="okProfile"
+        class="bg-[#1f3757] text-white px-4 py-2
+               rounded-lg hover:bg-[#162a44]">
+        OK
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= SCRIPT ================= -->
+<script>
+/* ---------- Dropdown ---------- */
+const authBtn = document.getElementById("authBtn");
+const userMenu = document.getElementById("userMenu");
+
+authBtn.addEventListener("click", (e) => {
+  e.stopPropagation();
+  userMenu.classList.toggle("hidden");
+});
+
+document.addEventListener("click", () => {
+  userMenu.classList.add("hidden");
+});
+
+/* ---------- Logout ---------- */
+document.getElementById("logoutBtn").onclick = () => {
+  window.location.href = "/logout";
+};
+
+/* ---------- Profile ---------- */
+document.getElementById("profileBtn").onclick = async () => {
+  try {
+    const res = await fetch("/api/profile", { credentials: "include" });
+    if (!res.ok) throw new Error();
+
+    const data = await res.json();
+    let html = `
+      <p><strong>Email:</strong> ${data.email}</p>
+      <p><strong>Total Analyses:</strong> ${data.totalAnalyses}</p>
+      <hr class="my-2">
+    `;
+
+    data.records.forEach((r, i) => {
+      html += `
+        <p><strong>${i + 1}. ${r.student_name}</strong></p>
+        <p>Average: ${r.average}</p>
+        <p>Result: ${r.result}</p>
+        <hr class="my-2">
+      `;
+    });
+
+    document.getElementById("profileData").innerHTML = html;
+    document.getElementById("profileModal").classList.remove("hidden");
+  } catch {
+    alert("Could not load profile data.");
+  }
+};
+
+document.getElementById("closeProfile").onclick =
+document.getElementById("okProfile").onclick = () => {
+  document.getElementById("profileModal").classList.add("hidden");
+};
+
+/* ---------- Analyze ---------- */
+document.getElementById("marksForm").onsubmit = async (e) => {
+  e.preventDefault();
+  document.getElementById("error").textContent = "";
+
+  try {
+    const formData = new FormData(e.target);
+
+    const res = await fetch("/analyze", {
+      method: "POST",
+      credentials: "include",
+      body: formData
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error);
+
+    document.getElementById("student").textContent = data.student;
+    document.getElementById("course1").textContent = data.course1;
+    document.getElementById("course2").textContent = data.course2;
+    document.getElementById("course3").textContent = data.course3;
+    document.getElementById("total").textContent = data.total;
+    document.getElementById("average").textContent = data.average;
+    document.getElementById("finalResult").textContent = data.result;
+
+    document.getElementById("result").classList.remove("hidden");
+
+    await fetch("/api/save-marks", {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    });
+
+  } catch (err) {
+    document.getElementById("error").textContent = err.message;
+  }
+};
+</script>
+
+</body>
+</html>
