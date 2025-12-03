@@ -9,13 +9,19 @@ app = Flask(__name__,template_folder='.',static_folder='.',static_url_path='')
 app.secret_key = "sanjana-secret"
 
 # Firebase Admin
-import os 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-cred_path = os.path.join(BASE_DIR, "firebase_key.json")
+import os
+import firebase_admin
+from firebase_admin import credentials
 
-cred = credentials.Certificate(cred_path)
-firebase_admin.initialize_app(cred)
-db = firestore.client()
+if not firebase_admin._apps:
+    cred = credentials.Certificate({
+        "type": "service_account",
+        "project_id": os.environ["FIREBASE_PROJECT_ID"],
+        "private_key": os.environ["FIREBASE_PRIVATE_KEY"].replace("\\n", "\n"),
+        "client_email": os.environ["FIREBASE_CLIENT_EMAIL"],
+        "token_uri": "https://oauth2.googleapis.com/token"
+    })
+    firebase_admin.initialize_app(cred)
 
 
 # ---------------------------------------------------
@@ -128,3 +134,4 @@ def login_page():
 
 
 app.run(debug=True, port=5500)
+
