@@ -65,20 +65,24 @@ def save_marks():
 # Analyze
 # ----------------------------------
 @app.route("/analyze", methods=["POST"])
+@app.route("/analyze", methods=["POST"])
 def analyze():
     try:
-        semester_raw = request.form.get("semester")
-        if not semester_raw:
-            return jsonify({"error": "Semester is required"}), 400
-        semester = int(semester_raw)
-        c1 = int(request.form.get("Course1"))
-        c2 = int(request.form.get("Course2"))
-        c3 = int(request.form.get("Course3"))
+        form = request.form
+
+        missing = [k for k in ["semester", "Course1", "Course2", "Course3"] if not form.get(k)]
+        if missing:
+            return jsonify({"error": f"Missing fields: {', '.join(missing)}"}), 400
+
+        semester = int(form["semester"])
+        c1 = int(form["Course1"])
+        c2 = int(form["Course2"])
+        c3 = int(form["Course3"])
 
         total = c1 + c2 + c3
         avg = round(total / 3, 2)
         result = "Pass" if min(c1, c2, c3) >= 40 else "Fail"
-        
+
         return jsonify({
             "semester": semester,
             "course1": c1,
@@ -87,11 +91,13 @@ def analyze():
             "total": total,
             "average": avg,
             "result": result
-        })
+        }), 200
 
-
+    except ValueError:
+        return jsonify({"error": "Marks and semester must be valid numbers"}), 400
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        print(" Analyze crash:", e) 
+        return jsonify({"error": "Internal server error"}), 500
 
 # ----------------------------------
 # Profile
@@ -132,5 +138,6 @@ def login_page():
 def logout():
     session.clear()
     return redirect("/login")
+
 
 
