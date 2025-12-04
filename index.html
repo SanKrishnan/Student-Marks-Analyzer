@@ -89,7 +89,7 @@
       Analysis Result
     </h2>
 
-    <p><strong>Student:</strong> <span id="student"></span></p>
+    <p><strong>Semester:</strong> <span id="semester_result"></span></p>
     <p><strong>Course 1:</strong> <span id="course1"></span></p>
     <p><strong>Course 2:</strong> <span id="course2"></span></p>
     <p><strong>Course 3:</strong> <span id="course3"></span></p>
@@ -205,7 +205,7 @@ document.getElementById("marksForm").onsubmit = async (e) => {
     const data = await res.json();
     if (!res.ok) throw new Error(data.error);
 
-    document.getElementById("student").textContent = data.student;
+    document.getElementById("semester_result").textContent = data.semester_result;
     document.getElementById("course1").textContent = data.course1;
     document.getElementById("course2").textContent = data.course2;
     document.getElementById("course3").textContent = data.course3;
@@ -230,6 +230,7 @@ document.getElementById("marksForm").onsubmit = async (e) => {
 
 </body>
 </html>
+
 
 
 
