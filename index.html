@@ -165,15 +165,16 @@ document.getElementById("profileBtn").onclick = async () => {
       <p><strong>Total Analyses:</strong> ${data.totalAnalyses}</p>
       <hr class="my-2">
     `;
-
+    
     data.records.forEach((r, i) => {
       html += `
-        <strong>Semester ${r.semester}</strong>
-        <p>Average: ${r.average}</p>
-        <p>Result: ${r.result}</p>
-        <hr class="my-2">
+      <p><strong>${i + 1}. Semester ${r.semester}</strong></p>
+      <p>Average: ${r.average}</p>
+      <p>Result: ${r.result}</p>
+      <hr class="my-2">
       `;
     });
+
 
     document.getElementById("profileData").innerHTML = html;
     document.getElementById("profileModal").classList.remove("hidden");
@@ -229,5 +230,6 @@ document.getElementById("marksForm").onsubmit = async (e) => {
 
 </body>
 </html>
+
 
 
