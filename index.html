@@ -168,7 +168,7 @@ document.getElementById("profileBtn").onclick = async () => {
 
     data.records.forEach((r, i) => {
       html += `
-        <p><strong>${i + 1}. ${r.student_name}</strong></p>
+        <strong>Semester ${r.semester}</strong>
         <p>Average: ${r.average}</p>
         <p>Result: ${r.result}</p>
         <hr class="my-2">
@@ -229,4 +229,5 @@ document.getElementById("marksForm").onsubmit = async (e) => {
 
 </body>
 </html>
+
 
