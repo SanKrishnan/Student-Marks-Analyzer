@@ -127,10 +127,15 @@ def index():
         return redirect("/login")
     return render_template("index.html")
 
+@app.route("/logout")
+def logout():
+    session.clear()     # ✅ Clear Flask session
+    return redirect("/login")  # ✅ Go back to login page
 
 @app.route("/login")
 def login_page():
     return render_template("Login_signup.html")
+
 
 
 
