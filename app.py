@@ -1,18 +1,20 @@
-from flask import Flask, request, jsonify, render_template, session
+from flask import Flask, request, jsonify, render_template, session, redirect
 import firebase_admin
 from firebase_admin import credentials, auth, firestore
-from flask import redirect
+import os
+from datetime import datetime
 
-
-app = Flask(__name__,template_folder='.',static_folder='.',static_url_path='')
+app = Flask(__name__, template_folder='.', static_folder='.', static_url_path='')
 
 app.secret_key = "sanjana-secret"
+app.config.update(
+    SESSION_COOKIE_SAMESITE="None",
+    SESSION_COOKIE_SECURE=True
+)
 
-# Firebase Admin
-import os
-import firebase_admin
-from firebase_admin import credentials
-
+# ----------------------------------
+# Firebase Admin Initialization
+# ----------------------------------
 if not firebase_admin._apps:
     cred = credentials.Certificate({
         "type": "service_account",
@@ -23,10 +25,13 @@ if not firebase_admin._apps:
     })
     firebase_admin.initialize_app(cred)
 
+db = firestore.client()   # ✅ NOW CORRECT PLACE
 
-# ---------------------------------------------------
-# SESSION LOGIN (after Firebase client login)
-# ---------------------------------------------------
+print("✅ Firebase and Firestore initialized")
+
+# ----------------------------------
+# Session Login
+# ----------------------------------
 @app.route("/api/session-login", methods=["POST"])
 def session_login():
     id_token = request.json.get("idToken")
@@ -38,52 +43,34 @@ def session_login():
     except:
         return jsonify({"error": "Invalid token"}), 401
 
-
-# ---------------------------------------------------
-# SAVE MARKS IN FIRESTORE
-# ---------------------------------------------------
-from datetime import datetime
-
+# ----------------------------------
+# Save Marks
+# ----------------------------------
 @app.route("/api/save-marks", methods=["POST"])
 def save_marks():
     if "email" not in session:
         return jsonify({"error": "Login required"}), 401
 
     data = request.json
-    user_email = session["email"]
-
-    # ✅ Add timestamp
     data["createdAt"] = datetime.utcnow()
 
-    # ✅ Save to Firestore
     db.collection("users") \
-      .document(user_email) \
-      .collection("marks") \
-      .add(data)
+        .document(session["email"]) \
+        .collection("marks") \
+        .add(data)
 
     return jsonify({"message": "Saved in Firestore"}), 200
 
-
-
-# ---------------------------------------------------
-# ANALYZE
-# ---------------------------------------------------
-print("🔥 Flask started, routes loading. ✅")
-@app.route("/api/session-login", methods=["POST"])
-
+# ----------------------------------
+# Analyze
+# ----------------------------------
 @app.route("/analyze", methods=["POST"])
 def analyze():
-    print("✅ /analyze route HIT")
     try:
         name = request.form.get("student_name")
-        c1 = request.form.get("Course1")
-        c2 = request.form.get("Course2")
-        c3 = request.form.get("Course3")
-
-        if not (name and c1 and c2 and c3):
-            return jsonify({"error": "All fields are required"}), 400
-
-        c1, c2, c3 = int(c1), int(c2), int(c3)
+        c1 = int(request.form.get("Course1"))
+        c2 = int(request.form.get("Course2"))
+        c3 = int(request.form.get("Course3"))
 
         total = c1 + c2 + c3
         avg = round(total / 3, 2)
@@ -97,46 +84,47 @@ def analyze():
             "total": total,
             "average": avg,
             "result": result
-        }), 200
+        })
 
     except Exception as e:
-        print("❌ Analyze error:", e)
         return jsonify({"error": str(e)}), 500
 
+# ----------------------------------
+# Profile
+# ----------------------------------
 @app.route("/api/profile")
 def profile():
     if "email" not in session:
         return jsonify({"error": "Login required"}), 401
 
-    email = session["email"]
-    marks_ref = db.collection("users").document(email).collection("marks")
+    docs = db.collection("users") \
+        .document(session["email"]) \
+        .collection("marks") \
+        .order_by("createdAt") \
+        .stream()
 
-    docs = marks_ref.order_by("createdAt").stream()
     records = [doc.to_dict() for doc in docs]
 
     return jsonify({
-        "email": email,
+        "email": session["email"],
         "totalAnalyses": len(records),
         "records": records
     })
 
-
+# ----------------------------------
+# Pages
+# ----------------------------------
 @app.route("/")
 def index():
     if "email" not in session:
         return redirect("/login")
     return render_template("index.html")
 
-@app.route("/logout")
-def logout():
-    session.clear()     # ✅ Clear Flask session
-    return redirect("/login")  # ✅ Go back to login page
-
 @app.route("/login")
 def login_page():
     return render_template("Login_signup.html")
 
-
-
-
-
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect("/login")
