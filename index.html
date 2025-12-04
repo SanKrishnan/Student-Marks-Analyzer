@@ -205,7 +205,7 @@ document.getElementById("marksForm").onsubmit = async (e) => {
     const data = await res.json();
     if (!res.ok) throw new Error(data.error);
 
-    document.getElementById("semester_result").textContent = data.semester_result;
+    document.getElementById("semester_result").textContent = data.semester;
     document.getElementById("course1").textContent = data.course1;
     document.getElementById("course2").textContent = data.course2;
     document.getElementById("course3").textContent = data.course3;
@@ -230,6 +230,7 @@ document.getElementById("marksForm").onsubmit = async (e) => {
 
 </body>
 </html>
+
 
 
 
