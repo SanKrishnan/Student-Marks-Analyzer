@@ -67,8 +67,10 @@ def save_marks():
 @app.route("/analyze", methods=["POST"])
 def analyze():
     try:
-        semester = request.form.get("semester_no")
-        semester = int(semester)
+        semester_raw = request.form.get("semester")
+        if not semester_raw:
+            return jsonify({"error": "Semester is required"}), 400
+        semester = int(semester_raw)
         c1 = int(request.form.get("Course1"))
         c2 = int(request.form.get("Course2"))
         c3 = int(request.form.get("Course3"))
@@ -130,4 +132,5 @@ def login_page():
 def logout():
     session.clear()
     return redirect("/login")
+
 
