@@ -67,7 +67,8 @@ def save_marks():
 @app.route("/analyze", methods=["POST"])
 def analyze():
     try:
-        name = request.form.get("student_name")
+        semester = request.form.get("semester_no")
+        semester = int(semester)
         c1 = int(request.form.get("Course1"))
         c2 = int(request.form.get("Course2"))
         c3 = int(request.form.get("Course3"))
@@ -75,9 +76,9 @@ def analyze():
         total = c1 + c2 + c3
         avg = round(total / 3, 2)
         result = "Pass" if min(c1, c2, c3) >= 40 else "Fail"
-
+        
         return jsonify({
-            "student": name,
+            "semester": semester,
             "course1": c1,
             "course2": c2,
             "course3": c3,
@@ -85,6 +86,7 @@ def analyze():
             "average": avg,
             "result": result
         })
+
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -128,3 +130,4 @@ def login_page():
 def logout():
     session.clear()
     return redirect("/login")
+
