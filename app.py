@@ -66,37 +66,47 @@ def save_marks():
 # ----------------------------------
 @app.route("/analyze", methods=["POST"])
 @app.route("/analyze", methods=["POST"])
+@app.route("/analyze", methods=["POST"])
 def analyze():
     try:
-        form = request.form
+        data = request.get_json() if request.is_json else request.form
 
-        missing = [k for k in ["semester", "Course1", "Course2", "Course3"] if not form.get(k)]
-        if missing:
-            return jsonify({"error": f"Missing fields: {', '.join(missing)}"}), 400
+        semester = int(data.get("semester"))
+        pass_mark = int(data.get("pass_mark"))
 
-        semester = int(form["semester"])
-        c1 = int(form["Course1"])
-        c2 = int(form["Course2"])
-        c3 = int(form["Course3"])
+        # Courses expected as list
+        courses = data.get("courses")
 
-        total = c1 + c2 + c3
-        avg = round(total / 3, 2)
-        result = "Pass" if min(c1, c2, c3) >= 40 else "Fail"
+        # If coming from form-data (string), convert to list
+        if isinstance(courses, str):
+            courses = courses.split(",")
+            courses = [int(c.strip()) for c in courses]
+
+        if not courses or len(courses) == 0:
+            return jsonify({"error": "At least one course is required"}), 400
+
+        marks = list(map(int, courses))
+        total_courses = len(marks)
+        total = sum(marks)
+        average = round(total / total_courses, 2)
+
+        # Check pass/fail
+        result = "Pass" if min(marks) >= pass_mark else "Fail"
 
         return jsonify({
             "semester": semester,
-            "course1": c1,
-            "course2": c2,
-            "course3": c3,
+            "total_courses": total_courses,
+            "pass_mark": pass_mark,
+            "marks": marks,
             "total": total,
-            "average": avg,
+            "average": average,
             "result": result
         }), 200
 
     except ValueError:
-        return jsonify({"error": "Marks and semester must be valid numbers"}), 400
+        return jsonify({"error": "Invalid number format"}), 400
     except Exception as e:
-        print(" Analyze crash:", e) 
+        print("Analyze error:", e)
         return jsonify({"error": "Internal server error"}), 500
 
 # ----------------------------------
@@ -138,6 +148,7 @@ def login_page():
 def logout():
     session.clear()
     return redirect("/login")
+
 
 
 
