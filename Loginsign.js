@@ -1,7 +1,12 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-analytics.js";
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-analytics.js";
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword
+} from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
 
+/* ================= Firebase Config ================= */
 const firebaseConfig = {
   apiKey: "AIzaSyCrsodPcoKohu381Nyr37nqG4WBgXEwljU",
   authDomain: "marks-analysis-58fc4.firebaseapp.com",
@@ -12,96 +17,112 @@ const firebaseConfig = {
   measurementId: "G-G4DNFWZHJJ"
 };
 
+/* ================= Init ================= */
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+getAnalytics(app);
 const auth = getAuth(app);
 
+/* ================= DOM Elements ================= */
 const submitButton = document.getElementById("submit");
 const signupButton = document.getElementById("sign-up");
+const returnBtn = document.getElementById("return-btn");
+
+const main = document.getElementById("main");
+const createacct = document.getElementById("create-acct");
+
 const emailInput = document.getElementById("email");
 const passwordInput = document.getElementById("password");
-const main = document.getElementById("main");
-const createacct = document.getElementById("create-acct")
 
 const signupEmailIn = document.getElementById("email-signup");
 const confirmSignupEmailIn = document.getElementById("confirm-email-signup");
 const signupPasswordIn = document.getElementById("password-signup");
-const confirmSignUpPasswordIn = document.getElementById("confirm-password-signup");
+const confirmSignupPasswordIn = document.getElementById("confirm-password-signup");
+
 const createacctbtn = document.getElementById("create-acct-btn");
 
-const returnBtn = document.getElementById("return-btn");
+/* ================= Sign Up ================= */
+createacctbtn.addEventListener("click", async (e) => {
+  e.preventDefault();
 
-var email, password, signupEmail, signupPassword, confirmSignupEmail, confirmSignUpPassword;
+  const signupEmail = signupEmailIn.value.trim();
+  const confirmSignupEmail = confirmSignupEmailIn.value.trim();
+  const signupPassword = signupPasswordIn.value;
+  const confirmSignupPassword = confirmSignupPasswordIn.value;
 
-createacctbtn.addEventListener("click", function() {
-  var isVerified = true;
-
-  signupEmail = signupEmailIn.value;
-  confirmSignupEmail = confirmSignupEmailIn.value;
-  if(signupEmail != confirmSignupEmail) {
-      window.alert("Email fields do not match. Try again.")
-      isVerified = false;
+  if (!signupEmail || !confirmSignupEmail || !signupPassword || !confirmSignupPassword) {
+    alert("Please fill out all required fields.");
+    return;
   }
 
-  signupPassword = signupPasswordIn.value;
-  confirmSignUpPassword = confirmSignUpPasswordIn.value;
-  if(signupPassword != confirmSignUpPassword) {
-      window.alert("Password fields do not match. Try again.")
-      isVerified = false;
+  if (signupEmail !== confirmSignupEmail) {
+    alert("Email fields do not match.");
+    return;
   }
-  
-  if(signupEmail == null || confirmSignupEmail == null || signupPassword == null || confirmSignUpPassword == null) {
-    window.alert("Please fill out all required fields.");
-    isVerified = false;
-  }
-  
-  if(isVerified) {
-    createUserWithEmailAndPassword(auth, signupEmail, signupPassword)
-      .then(async(userCredential) => {
-      // Signed in 
-      const user = userCredential.user;
-      await createFlaskSession(user);
-      window.alert("Success! Account created.");
-      window.location.href = "/";
-    })
-    .catch((error) => {
-    console.error(error);
-    window.alert(error.message);
-    });
 
+  if (signupPassword !== confirmSignupPassword) {
+    alert("Password fields do not match.");
+    return;
+  }
+
+  if (signupPassword.length < 6) {
+    alert("Password must be at least 6 characters.");
+    return;
+  }
+
+  try {
+    const userCredential = await createUserWithEmailAndPassword(
+      auth,
+      signupEmail,
+      signupPassword
+    );
+
+    await createFlaskSession(userCredential.user);
+    alert("Account created successfully!");
+    window.location.href = "/";
+
+  } catch (error) {
+    console.error("Firebase Signup Error:", error);
+    alert(error.code + " : " + error.message);
   }
 });
 
-submitButton.addEventListener("click", function() {
-  email = emailInput.value;
-  console.log(email);
-  password = passwordInput.value;
-  console.log(password);
+/* ================= Login ================= */
+submitButton.addEventListener("click", async (e) => {
+  e.preventDefault();
 
-  signInWithEmailAndPassword(auth, email, password)
-    .then(async (userCredential) => {
-      const user = userCredential.user;
-      await createFlaskSession(user);
-      console.log("Success! Welcome back!");
-      window.alert("Success! Welcome back!");
-      window.location.href = "/";
-    })
-    .catch((error) => {
-      console.error("Firebase Error:", error);
-      alert(error.code + " : " + error.message);
+  const email = emailInput.value.trim();
+  const password = passwordInput.value;
 
-    });
+  if (!email || !password) {
+    alert("Email and password are required.");
+    return;
+  }
+
+  try {
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+
+    await createFlaskSession(userCredential.user);
+    alert("Login successful!");
+    window.location.href = "/";
+
+  } catch (error) {
+    console.error("Firebase Login Error:", error);
+    alert(error.code + " : " + error.message);
+  }
 });
 
-signupButton.addEventListener("click", function() {
-    main.style.display = "none";
-    createacct.style.display = "block";
+/* ================= UI Toggle ================= */
+signupButton.addEventListener("click", () => {
+  main.style.display = "none";
+  createacct.style.display = "block";
 });
 
-returnBtn.addEventListener("click", function() {
-    main.style.display = "block";
-    createacct.style.display = "none";
+returnBtn.addEventListener("click", () => {
+  main.style.display = "block";
+  createacct.style.display = "none";
 });
+
+/* ================= Flask Session ================= */
 async function createFlaskSession(user) {
   const idToken = await user.getIdToken();
 
@@ -116,6 +137,3 @@ async function createFlaskSession(user) {
     throw new Error("Flask session creation failed");
   }
 }
-
-
-
