@@ -91,13 +91,19 @@ def analyze():
         average = round(total / total_courses, 2)
 
         # Check pass/fail
-        result = "Pass" if min(marks) >= pass_mark else "Fail"
+        course_results = [
+            "Pass" if m >= pass_mark else "Fail"
+        for m in marks
+        ]
+        result = "Pass" if all(m >= pass_mark for m in marks) else "Fail"
+
 
         return jsonify({
             "semester": semester,
             "total_courses": total_courses,
             "pass_mark": pass_mark,
             "marks": marks,
+            "course_results": course_results,
             "total": total,
             "average": average,
             "result": result
@@ -148,6 +154,7 @@ def login_page():
 def logout():
     session.clear()
     return redirect("/login")
+
 
 
 
