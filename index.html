@@ -202,7 +202,7 @@ document.getElementById("okProfile").onclick = () => {
 const courseCountInput = document.getElementById("courseCount");
 const coursesContainer = document.getElementById("coursesContainer");
 
-courseCountInput.addEventListener("input", () => {
+courseCountInput.addEventListener("change", () => {
   coursesContainer.innerHTML = "";
   const count = parseInt(courseCountInput.value);
 
@@ -276,3 +276,4 @@ document.getElementById("marksForm").onsubmit = async (e) => {
 
 </body>
 </html>
+
