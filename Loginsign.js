@@ -89,7 +89,6 @@ submitButton.addEventListener("click", function() {
     .catch((error) => {
       console.error("Firebase Error:", error);
       alert(error.code + " : " + error.message);
-    }
 
     });
 });
@@ -117,5 +116,6 @@ async function createFlaskSession(user) {
     throw new Error("Flask session creation failed");
   }
 }
+
 
 
