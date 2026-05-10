@@ -64,57 +64,121 @@ def save_marks():
 # ----------------------------------
 # Analyze
 # ----------------------------------
-@app.route("/analyze", methods=["POST"])
-@app.route("/analyze", methods=["POST"])
+# ----------------------------------
+# Analyze + GPA
+# ----------------------------------
 @app.route("/analyze", methods=["POST"])
 def analyze():
+
     try:
-        data = request.get_json() if request.is_json else request.form
+        data = request.get_json()
 
         semester = int(data.get("semester"))
         pass_mark = int(data.get("pass_mark"))
 
-        # Courses expected as list
-        courses = data.get("courses")
+        subjects = data.get("subjects")
 
-        # If coming from form-data (string), convert to list
-        if isinstance(courses, str):
-            courses = courses.split(",")
-            courses = [int(c.strip()) for c in courses]
+        if not subjects or len(subjects) == 0:
+            return jsonify({
+                "error": "At least one subject is required"
+            }), 400
 
-        if not courses or len(courses) == 0:
-            return jsonify({"error": "At least one course is required"}), 400
+        total_marks = 0
+        total_credit_points = 0
+        total_credits = 0
 
-        marks = list(map(int, courses))
-        total_courses = len(marks)
-        total = sum(marks)
-        average = round(total / total_courses, 2)
+        subject_results = []
 
-        # Check pass/fail
-        course_results = [
-            "Pass" if m >= pass_mark else "Fail"
-        for m in marks
-        ]
-        result = "Pass" if all(m >= pass_mark for m in marks) else "Fail"
+        for subject in subjects:
 
+            name = subject.get("name")
+            marks = int(subject.get("marks"))
+            credits = int(subject.get("credits"))
 
-        return jsonify({
+            total_marks += marks
+
+            # ---------------------------
+            # Grade Logic
+            # ---------------------------
+            if marks >= 90:
+                grade_point = 10
+                grade = "O"
+
+            elif marks >= 80:
+                grade_point = 9
+                grade = "A+"
+
+            elif marks >= 70:
+                grade_point = 8
+                grade = "A"
+
+            elif marks >= 60:
+                grade_point = 7
+                grade = "B+"
+
+            elif marks >= 50:
+                grade_point = 6
+                grade = "B"
+
+            elif marks >= 40:
+                grade_point = 5
+                grade = "C"
+
+            else:
+                grade_point = 0
+                grade = "F"
+
+            total_credit_points += grade_point * credits
+            total_credits += credits
+
+            subject_results.append({
+                "subject": name,
+                "marks": marks,
+                "credits": credits,
+                "grade": grade,
+                "grade_point": grade_point,
+                "result": "Pass" if marks >= pass_mark else "Fail"
+            })
+
+        total_subjects = len(subjects)
+
+        percentage = round(
+            (total_marks / (total_subjects * 100)) * 100,
+            2
+        )
+
+        gpa = round(
+            total_credit_points / total_credits,
+            2
+        )
+
+        final_result = (
+            "Pass"
+            if all(
+                s["marks"] >= pass_mark
+                for s in subjects
+            )
+            else "Fail"
+        )
+
+        response_data = {
             "semester": semester,
-            "total_courses": total_courses,
             "pass_mark": pass_mark,
-            "marks": marks,
-            "course_results": course_results,
-            "total": total,
-            "average": average,
-            "result": result
-        }), 200
+            "subjects": subject_results,
+            "total_subjects": total_subjects,
+            "total_marks": total_marks,
+            "percentage": percentage,
+            "gpa": gpa,
+            "result": final_result
+        }
 
-    except ValueError:
-        return jsonify({"error": "Invalid number format"}), 400
+        return jsonify(response_data), 200
+
     except Exception as e:
-        print("Analyze error:", e)
-        return jsonify({"error": "Internal server error"}), 500
-
+        print("Analyze Error:", e)
+        return jsonify({
+            "error": "Internal Server Error"
+        }), 500
 # ----------------------------------
 # Profile
 # ----------------------------------
