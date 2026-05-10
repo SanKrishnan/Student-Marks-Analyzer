@@ -155,8 +155,8 @@ def analyze():
         final_result = (
             "Pass"
             if all(
-                s["marks"] >= pass_mark
-                for s in subjects
+                subject["marks"] >= pass_mark
+                for subject in subject_results
             )
             else "Fail"
         )
