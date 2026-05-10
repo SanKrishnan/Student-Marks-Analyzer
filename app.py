@@ -102,27 +102,27 @@ def analyze():
             # ---------------------------
             if marks >= 90:
                 grade_point = 10
-                grade = "O"
+                grade = "S"
 
             elif marks >= 80:
                 grade_point = 9
-                grade = "A+"
+                grade = "A"
 
             elif marks >= 70:
                 grade_point = 8
-                grade = "A"
+                grade = "B"
 
             elif marks >= 60:
                 grade_point = 7
-                grade = "B+"
+                grade = "C"
 
             elif marks >= 50:
                 grade_point = 6
-                grade = "B"
+                grade = "D"
 
             elif marks >= 40:
                 grade_point = 5
-                grade = "C"
+                grade = "E"
 
             else:
                 grade_point = 0
