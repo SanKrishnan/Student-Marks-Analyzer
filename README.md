@@ -1,68 +1,147 @@
 # 🎓 Student Marks Analyzer
 
-A **Flask + Firebase** web application that allows authenticated users to analyze student marks, calculate totals and averages, determine pass/fail status, and securely store analysis history in **Firestore**.
-The application is **deployed on Vercel** as a serverless Flask app.
+A full-stack academic analytics web application built using Flask and Firebase that allows authenticated users to analyze student performance, calculate percentage and GPA, determine pass/fail status, and securely store analysis history in Firestore.
+
+The application is deployed on Vercel as a serverless Flask application.
 
 ---
 
-## 🚀 Live Deployment
+# 🚀 Live Deployment
 
-✅ Deployed using **Vercel Serverless Functions**
-✅ Backend: Flask
-✅ Frontend: HTML, Tailwind CSS, JavaScript
-✅ Authentication: Firebase Authentication
-✅ Database: Firebase Firestore
-
----
-
-## 📌 Features
-
-* 🔐 **User Authentication**
-
-  * Sign up & login using Firebase Authentication
-  * Secure session handling using Flask sessions 
-
-* 📊 **Marks Analysis**
-
-  * Input marks for three courses
-  * Calculates:
-
-    * Total marks
-    * Average marks
-    * Pass/Fail result (minimum 40 per subject)
-  * Real-time analysis response
-
-* ☁️ **Firestore Integration**
-
-  * Stores every analysis with timestamp
-  * Data is saved per authenticated user
-  * Profile page shows past analysis history 
-
-* 👤 **User Profile Dashboard**
-
-  * Displays:
-
-    * Logged-in email
-    * Total analyses performed
-    * Previous results with averages and outcomes 
-
-* 🎨 **Clean UI**
-
-  * Tailwind CSS for modern UI
-  * Modal-based profile viewer
-  * Dropdown user menu with logout and profile options 
+✅ Deployed using Vercel Serverless Functions  
+✅ Backend: Flask  
+✅ Frontend: HTML, Tailwind CSS, JavaScript  
+✅ Authentication: Firebase Authentication  
+✅ Database: Firebase Firestore  
 
 ---
 
-## 🗂️ Project Structure
+# 📌 Features
 
-```
-├── app.py / flas.py        # Flask backend (API + session handling)
-├── index.html              # Main marks analyzer UI
-├── Login_signup.html       # Login & signup page
-├── Login_signup.css        # Authentication page styles
-├── Loginsign.js            # Firebase auth logic + session creation
-├── requirements.txt        # Python dependencies
+## 🔐 User Authentication
+
+- Secure Sign Up & Login using Firebase Authentication
+- Session-based authentication using Flask sessions
+- Protected routes for authenticated users only
+- Logout functionality with secure session clearing
+
+---
+
+## 📊 Student Performance Analysis
+
+Users can:
+
+- Enter semester details
+- Add dynamic subject inputs
+- Input subject marks and credits
+- Analyze academic performance in real-time
+
+The application calculates:
+
+- Total Marks
+- Percentage
+- GPA (Grade Point Average)
+- Subject-wise Grades
+- Pass/Fail Status
+
+---
+
+## 🎯 GPA Calculation
+
+The GPA is calculated using a weighted credit-based formula:
+
+\[
+GPA = \frac{\sum (Grade\ Point \times Credits)}{\sum Credits}
+\]
+
+### Grade Mapping
+
+| Marks Range | Grade | Grade Point |
+|-------------|-------|-------------|
+| 90 - 100 | O | 10 |
+| 80 - 89 | A+ | 9 |
+| 70 - 79 | A | 8 |
+| 60 - 69 | B+ | 7 |
+| 50 - 59 | B | 6 |
+| 40 - 49 | C | 5 |
+| Below 40 | F | 0 |
+
+---
+
+# ☁️ Firestore Integration
+
+- Stores every academic analysis securely in Firebase Firestore
+- Data is organized user-wise
+- Each record includes:
+  - Semester
+  - Percentage
+  - GPA
+  - Subject details
+  - Final Result
+  - Timestamp
+
+---
+
+# 👤 User Dashboard
+
+The profile dashboard displays:
+
+- Logged-in user email
+- Total analyses performed
+- Previous academic records
+- Percentage history
+- GPA history
+- Pass/Fail outcomes
+
+---
+
+# 🎨 User Interface
+
+- Responsive and modern UI using Tailwind CSS
+- Dynamic subject input generation
+- Modal-based profile dashboard
+- Interactive dropdown menu for account actions
+- Clean academic analytics layout
+
+---
+
+# 🛠️ Tech Stack
+
+## Backend
+
+- Python
+- Flask
+- Firebase Admin SDK
+- Gunicorn
+
+## Frontend
+
+- HTML5
+- Tailwind CSS
+- JavaScript (ES6)
+
+## Database & Authentication
+
+- Firebase Authentication
+- Firebase Firestore
+
+## Deployment
+
+- Vercel Serverless Functions
+
+---
+
+# 🗂️ Project Structure
+
+```bash
+├── app.py / flas.py          # Flask backend and API routes
+├── index.html                # Main academic analyzer dashboard
+├── Login_signup.html         # Authentication page
+├── Login_signup.css          # Authentication styling
+├── Loginsign.js              # Firebase authentication logic
+├── requirements.txt          # Python dependencies
+├── vercel.json               # Vercel deployment configuration
+└── README.md
 ```
 
 ---
@@ -138,9 +217,22 @@ python flas.py
 * Editable analysis history
 * Role-based access
 
+## 🧠 Key Learning Outcomes
+
+This project demonstrates:
+
+1. Full-stack web development
+2. REST API handling using Flask
+3. Firebase Authentication integration
+4. Firestore database operations
+5. Session management
+6. Cloud deployment
+7. Dynamic frontend rendering
+8. GPA and percentage analytics
+9. Secure environment variable handling
 ---
 
 ## 🧑‍💻 Author
 
 **Sanjana Krishnan**
-CSE Student | Web Development & Data Science Enthusiast
+CSE Student | Data Science Enthusiast
