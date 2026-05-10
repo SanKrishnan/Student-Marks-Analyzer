@@ -50,20 +50,20 @@ The application calculates:
 
 The GPA is calculated using a weighted credit-based formula:
 
-\[
-GPA = \frac{\sum (Grade\ Point \times Credits)}{\sum Credits}
-\]
+```text
+GPA = Σ(Grade Point × Credits) / Σ(Credits)
+```
 
 ### Grade Mapping
 
 | Marks Range | Grade | Grade Point |
 |-------------|-------|-------------|
-| 90 - 100 | O | 10 |
-| 80 - 89 | A+ | 9 |
-| 70 - 79 | A | 8 |
-| 60 - 69 | B+ | 7 |
-| 50 - 59 | B | 6 |
-| 40 - 49 | C | 5 |
+| 90 - 100 | S | 10 |
+| 80 - 89 | A | 9 |
+| 70 - 79 | B | 8 |
+| 60 - 69 | C | 7 |
+| 50 - 59 | D | 6 |
+| 40 - 49 | E | 5 |
 | Below 40 | F | 0 |
 
 ---
